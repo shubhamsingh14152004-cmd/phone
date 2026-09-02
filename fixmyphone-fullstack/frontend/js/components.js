@@ -40,6 +40,7 @@ function footerHtml(){
   const wa = getStoreWhatsApp();
   const waClean = cleanWa(wa);
   const addr = getStoreAddress();
+  const social = getSocialLinks();
   return `
   <footer>
     <div class="wrap">
@@ -48,7 +49,10 @@ function footerHtml(){
           <div class="logo" style="margin-bottom:14px">${'<span class="mark">&#9881;&#65039;</span>'} FixMyPhone</div>
           <p style="font-size:13.5px;line-height:1.7;color:rgba(255,255,255,.55);max-width:280px">Trusted mobile phone repair for every major iOS and Android brand — transparent pricing, genuine parts and technicians who know your device.</p>
           <div class="social-row" style="margin-top:18px">
-            <a href="#">f</a><a href="#">in</a><a href="#">ig</a><a href="#">yt</a>
+            <a href="${social.facebook}" target="_blank" rel="noopener noreferrer" title="${social.rawFacebook ? 'Facebook: ' + escapeHtml(social.rawFacebook) : 'Facebook'}" ${social.rawFacebook ? '' : 'style="opacity:.4"'}>f</a>
+            <a href="${social.linkedin}" target="_blank" rel="noopener noreferrer" title="${social.rawLinkedin ? 'LinkedIn: ' + escapeHtml(social.rawLinkedin) : 'LinkedIn'}" ${social.rawLinkedin ? '' : 'style="opacity:.4"'}>in</a>
+            <a href="${social.instagram}" target="_blank" rel="noopener noreferrer" title="${social.rawInstagram ? 'Instagram: ' + escapeHtml(social.rawInstagram) : 'Instagram'}" ${social.rawInstagram ? '' : 'style="opacity:.4"'}>ig</a>
+            <a href="${social.youtube}" target="_blank" rel="noopener noreferrer" title="${social.rawYoutube ? 'YouTube: ' + escapeHtml(social.rawYoutube) : 'YouTube'}" ${social.rawYoutube ? '' : 'style="opacity:.4"'}>yt</a>
           </div>
         </div>
         <div><h5>Company</h5>
@@ -71,9 +75,12 @@ function footerHtml(){
 }
 
 function floatingContactWidget(){
-  const phone = getStorePhone();
-  const wa = getStoreWhatsApp();
+  const cfg = getPopupSettings();
+  if(!cfg.enabled) return '';
+  const phone = cfg.phone;
+  const wa = cfg.whatsapp;
   const waClean = cleanWa(wa);
+  const waEncodedMsg = encodeURIComponent(cfg.waText || 'Hi FixMyPhone, I need help with my phone repair');
   return `
   <div id="floating-contact-container">
     <!-- Popup Card -->
@@ -84,18 +91,18 @@ function floatingContactWidget(){
             <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.301-.15-1.781-.878-2.057-.978-.276-.1-.477-.15-.678.15-.201.3-.777.978-.952 1.179-.175.2-.351.226-.652.075-.301-.15-1.27-.468-2.42-1.493-.894-.798-1.498-1.783-1.674-2.084-.175-.3-.019-.462.132-.612.135-.135.301-.351.451-.527.151-.175.201-.3.301-.501.101-.2.05-.376-.025-.526-.075-.15-.678-1.636-.928-2.24-.244-.588-.492-.508-.678-.518l-.578-.01c-.201 0-.527.075-.802.376s-1.054 1.029-1.054 2.508c0 1.48 1.079 2.909 1.23 3.109.15.201 2.124 3.243 5.145 4.549.718.311 1.279.497 1.716.636.723.23 1.38.197 1.9.12.58-.086 1.781-.728 2.032-1.431.25-.702.25-1.304.175-1.43-.075-.126-.276-.201-.577-.352zM12.04 2c-5.522 0-10 4.478-10 10 0 1.77.463 3.498 1.343 5.025l-1.423 5.2 5.333-1.398c1.474.803 3.136 1.228 4.747 1.228 5.522 0 10-4.478 10-10s-4.478-10-10-10zm0 18.275c-1.503 0-2.977-.404-4.264-1.168l-.305-.181-3.167.831.846-3.088-.198-.316c-.84-1.336-1.287-2.887-1.287-4.478 0-4.562 3.713-8.275 8.275-8.275 4.563 0 8.275 3.713 8.275 8.275 0 4.563-3.712 8.275-8.275 8.275z"/></svg>
           </div>
           <div>
-            <div class="fcp-title">FixMyPhone Support</div>
-            <div class="fcp-status"><span class="fcp-status-dot"></span> Online &bull; Instant Help</div>
+            <div class="fcp-title">${escapeHtml(cfg.title)}</div>
+            <div class="fcp-status"><span class="fcp-status-dot"></span> ${escapeHtml(cfg.status)}</div>
           </div>
         </div>
         <button class="fcp-close-btn" onclick="toggleContactPopup(false)" title="Close">&times;</button>
       </div>
       <div class="fcp-body">
         <div class="fcp-msg">
-          👋 Hi! Need help with your phone repair? Chat with us or call directly:
+          ${escapeHtml(cfg.message)}
         </div>
         <div class="fcp-actions">
-          <a href="https://wa.me/${waClean}?text=Hi%20FixMyPhone%2C%20I%20need%20help%20with%20my%20phone%20repair" target="_blank" rel="noopener noreferrer" class="fcp-action-btn fcp-wa">
+          <a href="https://wa.me/${waClean}?text=${waEncodedMsg}" target="_blank" rel="noopener noreferrer" class="fcp-action-btn fcp-wa">
             <div class="fcp-action-icon fcp-icon-wa">
               <svg width="22" height="22" viewBox="0 0 24 24" fill="currentColor"><path d="M17.472 14.382c-.301-.15-1.781-.878-2.057-.978-.276-.1-.477-.15-.678.15-.201.3-.777.978-.952 1.179-.175.2-.351.226-.652.075-.301-.15-1.27-.468-2.42-1.493-.894-.798-1.498-1.783-1.674-2.084-.175-.3-.019-.462.132-.612.135-.135.301-.351.451-.527.151-.175.201-.3.301-.501.101-.2.05-.376-.025-.526-.075-.15-.678-1.636-.928-2.24-.244-.588-.492-.508-.678-.518l-.578-.01c-.201 0-.527.075-.802.376s-1.054 1.029-1.054 2.508c0 1.48 1.079 2.909 1.23 3.109.15.201 2.124 3.243 5.145 4.549.718.311 1.279.497 1.716.636.723.23 1.38.197 1.9.12.58-.086 1.781-.728 2.032-1.431.25-.702.25-1.304.175-1.43-.075-.126-.276-.201-.577-.352zM12.04 2c-5.522 0-10 4.478-10 10 0 1.77.463 3.498 1.343 5.025l-1.423 5.2 5.333-1.398c1.474.803 3.136 1.228 4.747 1.228 5.522 0 10-4.478 10-10s-4.478-10-10-10zm0 18.275c-1.503 0-2.977-.404-4.264-1.168l-.305-.181-3.167.831.846-3.088-.198-.316c-.84-1.336-1.287-2.887-1.287-4.478 0-4.562 3.713-8.275 8.275-8.275 4.563 0 8.275 3.713 8.275 8.275 0 4.563-3.712 8.275-8.275 8.275z"/></svg>
             </div>
@@ -126,7 +133,7 @@ function floatingContactWidget(){
     <!-- Floating Launcher Button -->
     <div class="fcp-trigger-wrapper">
       <div class="fcp-pill-badge" id="fcp-pill-badge" onclick="toggleContactPopup()">
-        <span>💬 Need help? <strong>Chat or Call</strong></span>
+        <span>${escapeHtml(cfg.badgeText)}</span>
       </div>
       <button id="fcp-trigger-btn" class="fcp-trigger-btn" onclick="toggleContactPopup()" title="Contact & WhatsApp" aria-label="Contact and WhatsApp Support">
         <div class="fcp-btn-pulse"></div>

@@ -163,6 +163,15 @@ function brandsSection(){
             <div class="brand-action">Inquire Now &rarr;</div>
           </button>`;
         }).join('')}
+
+        <!-- Etc. / Other Phone Brand Tile -->
+        <button class="brand-tile" style="--brand-accent:var(--blue)" onclick="toggleContactPopup(true);" title="Other / Unlisted Phone Brands">
+          <div class="brand-icon-wrap" style="background:linear-gradient(135deg, #0B1220, #2563eb);color:#ffffff">
+            <span style="font-family:'Poppins',sans-serif;font-weight:800;font-size:15px;letter-spacing:.5px">ETC</span>
+          </div>
+          <div class="bn">Etc.</div>
+          <div class="brand-action">Inquire Now &rarr;</div>
+        </button>
       </div>
     </div>
   </section>`;

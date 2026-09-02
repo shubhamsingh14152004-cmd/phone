@@ -11,7 +11,7 @@ function loginView(){
       </div>
       <div class="card" style="padding:26px">
         <h3 style="margin:0 0 8px">Admin</h3>
-        <p class="small-note" style="margin:0 0 18px">Manage repairs, pricing, technicians and more.</p>
+        <p class="small-note" style="margin:0 0 18px">Edit phone numbers, WhatsApp, store address, locations, and add phone brands.</p>
         <form onsubmit="adminLogin(event)">
           <div class="field"><label>Email</label><input name="email" value="admin@fixmyphone.com"></div>
           <div class="field"><label>Password</label><input name="password" type="password" value="Admin@123"></div>
@@ -39,9 +39,17 @@ async function adminLogin(e){
     const data = await res.json();
     ADMIN_TOKEN = data.token;
     ADMIN_SESSION = true;
-    nav('#admin/overview');
+    if (typeof localStorage !== 'undefined') localStorage.setItem('fixmyphone_admin_token', data.token);
+    toast('✅ Logged in successfully.');
+    nav('#admin/contact');
   }catch(err){
     toast('Could not reach the server. Is the backend running?');
   }
 }
-function adminLogout(){ ADMIN_SESSION=false; ADMIN_TOKEN=null; nav('#home'); }
+function adminLogout(){
+  ADMIN_SESSION = false;
+  ADMIN_TOKEN = null;
+  if (typeof localStorage !== 'undefined') localStorage.removeItem('fixmyphone_admin_token');
+  toast('Logged out.');
+  nav('#home');
+}

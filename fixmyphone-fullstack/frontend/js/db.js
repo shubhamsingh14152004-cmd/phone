@@ -9,8 +9,10 @@ const API_BASE = (window.API_BASE !== undefined && window.API_BASE !== '')
     : '');
 
 const DB = { brands: null, services: null, prices: null, bookings: null, technicians: null, settings: null };
-let ADMIN_SESSION = false;
-let ADMIN_TOKEN = null;
+window.DB = DB;
+
+let ADMIN_TOKEN = (typeof localStorage !== 'undefined' ? localStorage.getItem('fixmyphone_admin_token') : null) || null;
+let ADMIN_SESSION = !!ADMIN_TOKEN;
 
 async function apiGet(name) {
   const res = await fetch(`${API_BASE}/api/${name}`);
@@ -22,6 +24,12 @@ async function apiPut(name, value) {
   if (ADMIN_TOKEN) headers['Authorization'] = 'Bearer ' + ADMIN_TOKEN;
   const res = await fetch(`${API_BASE}/api/${name}`, { method: 'PUT', headers, body: JSON.stringify(value) });
   if (!res.ok) {
+    if (res.status === 401) {
+      ADMIN_SESSION = false;
+      ADMIN_TOKEN = null;
+      if (typeof localStorage !== 'undefined') localStorage.removeItem('fixmyphone_admin_token');
+      throw new Error('Admin session expired or unauthorized. Please log in again.');
+    }
     const err = await res.json().catch(() => ({ error: 'Request failed.' }));
     throw new Error(err.error || 'Request failed.');
   }
@@ -38,13 +46,20 @@ async function initData() {
   DB.bookings = bookings;
   DB.technicians = technicians;
   DB.settings = settings;
+  window.DB = DB;
 }
 
 async function persist(key) {
   try {
-    await apiPut(key, DB[key]);
+    const updated = await apiPut(key, DB[key]);
+    if (updated) {
+      DB[key] = updated;
+      window.DB[key] = updated;
+    }
+    return updated;
   } catch (e) {
     console.error('Failed to save', key, e);
-    toast('Could not save changes to the server: ' + e.message);
+    toast('⚠️ Could not save to server: ' + e.message);
+    throw e;
   }
 }
