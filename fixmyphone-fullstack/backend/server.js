@@ -1,8 +1,8 @@
 require('dotenv').config();
 const express = require('express');
 const cors = require('cors');
+const fs = require('fs');
 const path = require('path');
-
 const { exec } = require('child_process');
 
 const { initStore } = require('./src/data/store');
@@ -13,7 +13,7 @@ const app = express();
 app.use(cors());
 app.use(express.json({ limit: '10mb' })); // higher limit to allow booking photo uploads (base64)
 
-initStore(); // creates + seeds storage/database.json on first run
+initStore(); // creates + seeds storage/database.json or in-memory DB
 
 app.get('/api', (req, res) => {
   res.json({ status: 'online', service: 'FixMyPhone API Server', timestamp: new Date().toISOString() });
@@ -25,12 +25,24 @@ app.use('/api', collectionsRoutes);
 app.get('/admin', (req, res) => res.redirect('/#admin'));
 app.get('/login', (req, res) => res.redirect('/#login'));
 
-// Optional: Serve frontend static files if accessed directly on this port
-const frontendPath = path.join(__dirname, '..', 'frontend');
+// Serve frontend static files
+const possibleFrontendPaths = [
+  path.join(__dirname, '..', 'frontend'),
+  path.join(__dirname, 'frontend'),
+  path.join(process.cwd(), 'fixmyphone-fullstack', 'frontend'),
+  path.join(process.cwd(), 'frontend')
+];
+const frontendPath = possibleFrontendPaths.find(p => fs.existsSync(p)) || path.join(__dirname, '..', 'frontend');
+
 app.use(express.static(frontendPath));
 app.get('*', (req, res) => {
   if (req.path.startsWith('/api/')) return res.status(404).json({ error: 'API endpoint not found' });
-  res.sendFile(path.join(frontendPath, 'index.html'));
+  const indexFile = path.join(frontendPath, 'index.html');
+  if (fs.existsSync(indexFile)) {
+    res.sendFile(indexFile);
+  } else {
+    res.json({ message: 'FixMyPhone API Server running', frontendStatus: 'Static assets path: ' + frontendPath });
+  }
 });
 
 function openBrowser(url) {
@@ -51,18 +63,22 @@ function openBrowser(url) {
 }
 
 const PORT = process.env.PORT || 3000;
-app.listen(PORT, () => {
-  const adminUrl = `http://localhost:${PORT}/#admin`;
-  console.log(`\n========================================`);
-  console.log(`FixMyPhone Backend API Server Running`);
-  console.log(`Admin Panel:  ${adminUrl}`);
-  console.log(`API URL:      http://localhost:${PORT}/api`);
-  console.log(`Frontend URL: http://localhost:5173 (run 'npm run dev:frontend')`);
-  console.log(`========================================\n`);
+if (!process.env.VERCEL && !process.env.NOW_REGION && require.main === module) {
+  app.listen(PORT, () => {
+    const adminUrl = `http://localhost:${PORT}/#admin`;
+    console.log(`\n========================================`);
+    console.log(`FixMyPhone Backend API Server Running`);
+    console.log(`Admin Panel:  ${adminUrl}`);
+    console.log(`API URL:      http://localhost:${PORT}/api`);
+    console.log(`Frontend URL: http://localhost:5173 (run 'npm run dev:frontend')`);
+    console.log(`========================================\n`);
 
-  // Automatically open the Admin Panel in default browser on startup
-  if (process.env.AUTO_OPEN !== 'false') {
-    openBrowser(adminUrl);
-  }
-});
+    if (process.env.AUTO_OPEN !== 'false') {
+      openBrowser(adminUrl);
+    }
+  });
+}
+
+module.exports = app;
+
 
