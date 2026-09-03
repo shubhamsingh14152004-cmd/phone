@@ -1,15 +1,11 @@
 {
   "version": 2,
-  "builds": [
+  "buildCommand": "npm run build --prefix fixmyphone-fullstack/frontend",
+  "outputDirectory": "fixmyphone-fullstack/frontend/dist",
+  "rewrites": [
     {
-      "src": "fixmyphone-fullstack/backend/server.js",
-      "use": "@vercel/node"
-    }
-  ],
-  "routes": [
-    {
-      "src": "/(.*)",
-      "dest": "fixmyphone-fullstack/backend/server.js"
+      "source": "/api/(.*)",
+      "destination": "/api/index.js"
     }
   ]
 }
