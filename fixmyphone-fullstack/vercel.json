@@ -2,10 +2,16 @@
   "version": 2,
   "buildCommand": "npm run build --prefix frontend",
   "outputDirectory": "frontend/dist",
-  "rewrites": [
+  "redirects": [
     {
-      "source": "/api/(.*)",
-      "destination": "/api/index.js"
+      "source": "/admin",
+      "destination": "/#admin",
+      "permanent": false
+    },
+    {
+      "source": "/login",
+      "destination": "/#login",
+      "permanent": false
     }
   ]
 }

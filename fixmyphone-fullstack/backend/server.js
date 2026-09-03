@@ -15,11 +15,23 @@ app.use(express.json({ limit: '10mb' })); // higher limit to allow booking photo
 
 initStore(); // creates + seeds storage/database.json or in-memory DB
 
-app.get('/api', (req, res) => {
+const statusResponse = (req, res) => {
   res.json({ status: 'online', service: 'FixMyPhone API Server', timestamp: new Date().toISOString() });
-});
+};
+
+// Health and status endpoints
+app.get('/api', statusResponse);
+app.get('/api/status', statusResponse);
+app.get('/api/health', statusResponse);
+app.get('/health', statusResponse);
+
+// Primary API routes mounted at /api
 app.use('/api/auth', authRoutes);
 app.use('/api', collectionsRoutes);
+
+// Fallback API routes mounted at root / for serverless runtimes that strip /api prefix
+app.use('/auth', authRoutes);
+app.use('/', collectionsRoutes);
 
 // Route redirects for convenience
 app.get('/admin', (req, res) => res.redirect('/#admin'));
@@ -27,16 +39,20 @@ app.get('/login', (req, res) => res.redirect('/#login'));
 
 // Serve frontend static files
 const possibleFrontendPaths = [
+  path.join(__dirname, '..', 'frontend', 'dist'),
   path.join(__dirname, '..', 'frontend'),
+  path.join(__dirname, 'frontend', 'dist'),
   path.join(__dirname, 'frontend'),
+  path.join(process.cwd(), 'fixmyphone-fullstack', 'frontend', 'dist'),
   path.join(process.cwd(), 'fixmyphone-fullstack', 'frontend'),
+  path.join(process.cwd(), 'frontend', 'dist'),
   path.join(process.cwd(), 'frontend')
 ];
 const frontendPath = possibleFrontendPaths.find(p => fs.existsSync(p)) || path.join(__dirname, '..', 'frontend');
 
 app.use(express.static(frontendPath));
 app.get('*', (req, res) => {
-  if (req.path.startsWith('/api/')) return res.status(404).json({ error: 'API endpoint not found' });
+  if (req.path.startsWith('/api/') || req.path === '/api') return res.status(404).json({ error: 'API endpoint not found' });
   const indexFile = path.join(frontendPath, 'index.html');
   if (fs.existsSync(indexFile)) {
     res.sendFile(indexFile);
