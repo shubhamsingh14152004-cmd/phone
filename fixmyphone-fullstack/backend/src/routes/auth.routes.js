@@ -7,7 +7,7 @@ const router = express.Router();
 // Demo credential, read from env. For real production use, replace this with
 // a users table where each admin has their own hashed password.
 const ADMIN_EMAIL = process.env.ADMIN_EMAIL || 'admin@fixmyphone.com';
-const ADMIN_PASSWORD_HASH = bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'Admin@123', 10);
+const ADMIN_PASSWORD_HASH = bcrypt.hashSync(process.env.ADMIN_PASSWORD || 'Sagar@123', 10);
 
 router.post('/login', (req, res) => {
   const { email, password } = req.body || {};

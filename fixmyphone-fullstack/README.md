@@ -50,7 +50,7 @@ Runs the Vite frontend development server at `http://localhost:5173`.
 ---
 
 ### Credentials
-- **Admin login** (`/#login`): `admin@fixmyphone.com` / `Admin@123` (configured in `backend/.env`).
+- **Admin login** (`/#login`): `admin@fixmyphone.com` / `Sagar@123` (configured in `backend/.env`).
 
 ## What actually changed vs. the single-file version
 

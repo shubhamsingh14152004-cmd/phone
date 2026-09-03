@@ -14,7 +14,7 @@ function loginView(){
         <p class="small-note" style="margin:0 0 18px">Edit phone numbers, WhatsApp, store address, locations, and add phone brands.</p>
         <form onsubmit="adminLogin(event)">
           <div class="field"><label>Email</label><input name="email" value="admin@fixmyphone.com"></div>
-          <div class="field"><label>Password</label><input name="password" type="password" value="Admin@123"></div>
+          <div class="field"><label>Password</label><input name="password" type="password" value="Sagar@123"></div>
           <button class="btn btn-primary" style="width:100%" type="submit">Admin Login</button>
           <p class="small-note" style="margin-top:10px">Demo credentials are pre-filled (set in backend/.env). Signing in gets a real JWT from the API — it's just a single shared admin account rather than per-user accounts.</p>
         </form>
